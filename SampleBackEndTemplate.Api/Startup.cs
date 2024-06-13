@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Collections.Generic;
 
 namespace SampleBackEndTemplate.Api
 {
@@ -51,6 +52,16 @@ namespace SampleBackEndTemplate.Api
             app.UseHttpsRedirection();
             app.UseMiddleware<ErrorHandlerMiddleware>();
             app.UseRouting();
+
+            var allowedOrigins = new List<string>();
+            this._configuration.GetSection(nameof(allowedOrigins)).Bind(allowedOrigins);
+            app.UseCors(builder =>
+            {
+                builder.WithOrigins(allowedOrigins.ToArray())
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
 
             app.UseRouting();
             app.UseAuthentication();
